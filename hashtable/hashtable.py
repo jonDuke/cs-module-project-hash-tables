@@ -95,7 +95,26 @@ class HashTable:
 
         Implement this.
         """
-        self.storage[self.hash_index(key)] = HashTableEntry(key, value)
+        index = self.hash_index(key)
+
+        if self.storage[index] is None:
+            # No value there yet, just insert new entry
+            self.storage[index] = HashTableEntry(key, value)
+        else:
+            # Collision, add to linked list
+            node = self.storage[index]
+            while node.next is not None:
+                if node.key == key:
+                    # existing key was given, overwrite the value
+                    node.value = value
+                    return
+                node = node.next
+
+            if node.key == key:  # Check last node
+                node.value = value
+                return
+
+            node.next = HashTableEntry(key, value)  # Create new node
 
 
     def delete(self, key):
@@ -108,12 +127,30 @@ class HashTable:
         """
         index = self.hash_index(key)
 
-        if (self.storage[index] is not None) and (self.storage[index].key != key):
-            # Print warning if the key is not found
+        if self.storage[index] is None:
+            # No keys at this index
             print("Warning, key not found")
-        else:
-            # Erase the item at that index
-            self.storage[index] = None
+            return
+
+        prev = None
+        node = self.storage[index]
+
+        while True:
+            if node.key == key:
+                # key found, delete it
+                if prev is None:  # node was the head
+                    self.storage[index] = node.next
+                else:  # node was not the head
+                    prev.next = node.next
+                return
+
+            # move to next nodes
+            prev, node = node, node.next
+            if node is None:  # end of list reached
+                break
+
+        # Key not found
+        print("Warning, key not found")
 
 
     def get(self, key):
@@ -126,8 +163,19 @@ class HashTable:
         """
         index = self.hash_index(key)
         if self.storage[index] is not None:
-            # return the value, if it exists
-            return self.storage[index].value
+            # find the item with this key and return it
+            node = self.storage[index]
+            while node.next is not None:
+                if node.key == key:  # check this node
+                    return node.value
+                node = node.next  # move to next node
+
+            # last node reached here
+            if node.key == key:
+                return node.value
+            else:
+                # key not found
+                return None
         else:
             return None
 
@@ -141,7 +189,7 @@ class HashTable:
         """
         # reset variables
         self.capacity = new_capacity
-        old = self.storage.copy()
+        old = self.storage
         self.storage = [None] * new_capacity
 
         # rehash old items into the new list
@@ -149,6 +197,11 @@ class HashTable:
             if item is not None:
                 self.put(item.key, item.value)
 
+                # traverse linked lists to add all items
+                node = item.next
+                while node is not None:
+                    self.put(node.key, node.value)
+                    node = node.next
 
 
 if __name__ == "__main__":
