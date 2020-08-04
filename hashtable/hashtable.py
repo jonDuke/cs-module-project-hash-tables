@@ -32,6 +32,22 @@ class HashTable:
         return self.size
 
 
+    def __str__(self):
+        """ returns the contents of this hash table as a formatted """
+        output = ""
+        for item in self.storage:
+            if item is not None:
+                output += f"\t{item.key}: {item.value}\n"
+
+                # check linked list items
+                node = item.next
+                while node is not None:
+                    output += f"\t{item.key}: {item.value}\n"
+                    node = node.next
+        
+        return "{\n" + output + "}"
+
+
     def get_num_slots(self):
         """
         Return the length of the list you're using to hold the hash
@@ -212,6 +228,9 @@ class HashTable:
 
         Implement this.
         """
+        # Ensure new_capacity is an int
+        new_capacity = int(new_capacity)
+
         # reset variables
         self.capacity = new_capacity
         old = self.storage
@@ -261,5 +280,9 @@ if __name__ == "__main__":
     # Test if data intact after resizing
     for i in range(1, 13):
         print(ht.get(f"line_{i}"))
+    
+    # Test __str__()
+    print("\nHash table contents:")
+    print(ht)
 
     print("")
