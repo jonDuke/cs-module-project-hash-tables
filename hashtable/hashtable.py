@@ -20,9 +20,16 @@ class HashTable:
     Implement this.
     """
 
-    def __init__(self, capacity):
+    def __init__(self, capacity, auto_resize=True):
         self.capacity = capacity
+        self.size = 0
         self.storage = [None] * capacity
+        self.auto_resize = auto_resize
+
+    
+    def __len__(self):
+        """ returns the number of items stored in this hash table """
+        return self.size
 
 
     def get_num_slots(self):
@@ -44,7 +51,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.size / self.capacity
 
 
     def fnv1(self, key):
@@ -115,6 +122,10 @@ class HashTable:
                 return
 
             node.next = HashTableEntry(key, value)  # Create new node
+        
+        self.size += 1
+        if self.auto_resize:
+            self.check_load()
 
 
     def delete(self, key):
@@ -142,6 +153,9 @@ class HashTable:
                     self.storage[index] = node.next
                 else:  # node was not the head
                     prev.next = node.next
+                self.size -= 1
+                if self.auto_resize:
+                    self.check_load()
                 return
 
             # move to next nodes
@@ -178,6 +192,17 @@ class HashTable:
                 return None
         else:
             return None
+
+    
+    def check_load(self):
+        """
+        Checks load factor and resizes if necessary
+        """
+        load = self.get_load_factor()
+        if load > .7:
+            self.resize(self.capacity * 2)  # high load, resize up
+        elif load < .2:
+            self.resize(self.capacity / 2)  # low load, resize down
 
 
     def resize(self, new_capacity):
