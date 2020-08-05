@@ -5,9 +5,11 @@ def word_count(s):
     Outputs all keys in lowercase
     """
     # ignore certain characters, according to the readme
-    for char in s:
-        if char in '":;,.-+=/\\|[]{}()*^&':
-            s = s.replace(char, '')
+    # for char in s:
+    #     if char in '":;,.-+=/\\|[]{}()*^&':
+    #         s = s.replace(char, '')
+    
+    s = ''.join(c for c in s if c not in '":;,.-+=/\\|[]{}()*^&')
     
     words = s.lower().split() # get a list of all words in lower case
     output = {}
