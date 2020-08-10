@@ -1,6 +1,21 @@
 def word_count(s):
-    # Your code here
+    """
+    Returns a dictionary of words and their counts
 
+    Outputs all keys in lowercase
+    """
+    # ignore certain characters, according to the readme
+    s = ''.join(c for c in s if c not in '":;,.-+=/\\|[]{}()*^&')
+    
+    words = s.lower().split() # get a list of all words in lower case
+    output = {}
+    for word in words:
+        if word in output:
+            output[word] += 1  # existing word, increment count
+        else:
+            output[word] = 1  # found new word, add it as a key
+
+    return output
 
 
 if __name__ == "__main__":
